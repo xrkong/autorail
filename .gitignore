@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 OAI_CONFIG_LIST
+log/*

@@ -82,4 +82,17 @@ for model in [item["model"] for item in config_list if "model" in item]:
     #print(f"{token_count.num_tokens_from_messages(groupchat.messages, model)} prompt tokens counted by num_tokens_from_messages().")
 
 
+# save message and agent token counts to a file
+import os
+import json
+file_path = os.path.join("log", 'token_counts.json')
+
+if not os.path.exists("log"):
+    os.makedirs("log")
+
+with open(os.path.join("log", 'token_counts.json'), 'w') as fp:
+    json.dump(agents_token_count, fp, indent=4)
+
+with open(os.path.join("log", 'message.json'), 'w') as fp:
+    json.dump(groupchat.messages, fp, indent=4)
 
