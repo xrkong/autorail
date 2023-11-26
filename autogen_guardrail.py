@@ -1,5 +1,6 @@
 import autogen
-from autogen import AssistantAgent, UserProxyAgent
+#from autogen.agentchat import UserProxyAgent
+#from autogen.oai.completion import Completion
 
 config_list =  autogen.config_list_from_json(
     env_or_file="OAI_CONFIG_LIST",
@@ -17,7 +18,7 @@ user_proxy = autogen.UserProxyAgent(
 )
 
 # create a UserProxyAgent instance named "evaluator" 
-evaluator = UserProxyAgent(
+evaluator = autogen.UserProxyAgent(
     name="evaluator",
     human_input_mode="NEVER",
     system_message="""
@@ -34,7 +35,7 @@ evaluator = UserProxyAgent(
     },)
 
 # create a UserProxyAgent instance named "reviser"
-reviser = UserProxyAgent(
+reviser = autogen.UserProxyAgent(
     name="reviser",
     human_input_mode="NEVER",
     system_message="""
@@ -54,5 +55,31 @@ groupchat = autogen.GroupChat(agents=[user_proxy, evaluator, reviser], messages=
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=False)
 
 user_proxy.initiate_chat(manager, message="It's sad and kind of funny how they always play cruel jokes on their fans")
+
+# get the messages from the groupchat
+print(groupchat.messages)
+
+# https://github.com/openai/openai-cookbook/blob/feef1bf3982e15ad180e17732525ddbadaf2b670/examples/How_to_count_tokens_with_tiktoken.ipynb#L8
+
+import token_count  
+
+for model in [
+    "gpt-3.5-turbo",
+    "gpt-4",
+    ]:
+    print(model)
+    # example token count from the function defined above
+    print(f"{token_count.num_tokens_from_messages(groupchat.messages, model)} prompt tokens counted by num_tokens_from_messages().")
+    # example token count from the OpenAI API
+    # import openai
+    # response = openai.ChatCompletion.create(
+    #     model=model,
+    #     messages=groupchat.messages,
+    #     temperature=0,
+    #     max_tokens=1,  # we're only counting input tokens here, so let's not waste tokens on the output
+    # )
+    # print(f'{response["usage"]["prompt_tokens"]} prompt tokens counted by the OpenAI API.')
+    # print()
+
 
 
