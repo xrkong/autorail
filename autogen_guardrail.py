@@ -1,6 +1,9 @@
 import autogen
+import token_count  
 #from autogen.agentchat import UserProxyAgent
 #from autogen.oai.completion import Completion
+
+agents_token_count = {}
 
 config_list =  autogen.config_list_from_json(
     env_or_file="OAI_CONFIG_LIST",
@@ -16,6 +19,7 @@ user_proxy = autogen.UserProxyAgent(
    code_execution_config={"last_n_messages": 2, "work_dir": "groupchat"},
    human_input_mode="ALWAYS"
 )
+agents_token_count[user_proxy.name] = token_count.num_tokens_from_messages(user_proxy._oai_system_message)
 
 # create a UserProxyAgent instance named "evaluator" 
 evaluator = autogen.UserProxyAgent(
@@ -33,6 +37,7 @@ evaluator = autogen.UserProxyAgent(
         "temperature": 0,
         "config_list": config_list,
     },)
+agents_token_count[evaluator.name] = token_count.num_tokens_from_messages(evaluator._oai_system_message)
 
 # create a UserProxyAgent instance named "reviser"
 reviser = autogen.UserProxyAgent(
@@ -50,6 +55,7 @@ reviser = autogen.UserProxyAgent(
         "temperature": 0.2,
         "config_list": config_list,
     },)
+agents_token_count[reviser.name] = token_count.num_tokens_from_messages(reviser._oai_system_message)
 
 groupchat = autogen.GroupChat(agents=[user_proxy, evaluator, reviser], messages=[], max_round=12)
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=False)
@@ -60,26 +66,20 @@ user_proxy.initiate_chat(manager, message="It's sad and kind of funny how they a
 print(groupchat.messages)
 
 # https://github.com/openai/openai-cookbook/blob/feef1bf3982e15ad180e17732525ddbadaf2b670/examples/How_to_count_tokens_with_tiktoken.ipynb#L8
-
-import token_count  
-
-for model in [
-    "gpt-3.5-turbo",
-    "gpt-4",
-    ]:
+for model in [item["model"] for item in config_list if "model" in item]:
     print(model)
-    # example token count from the function defined above
-    print(f"{token_count.num_tokens_from_messages(groupchat.messages, model)} prompt tokens counted by num_tokens_from_messages().")
-    # example token count from the OpenAI API
-    # import openai
-    # response = openai.ChatCompletion.create(
-    #     model=model,
-    #     messages=groupchat.messages,
-    #     temperature=0,
-    #     max_tokens=1,  # we're only counting input tokens here, so let's not waste tokens on the output
-    # )
-    # print(f'{response["usage"]["prompt_tokens"]} prompt tokens counted by the OpenAI API.')
-    # print()
+
+    for item in groupchat.messages:
+        if 'name' in item and 'content' in item:
+            name = item['name']
+            tokens = token_count.num_tokens_from_messages([item], model)
+            if name in agents_token_count:
+                agents_token_count[name] += tokens
+            else:
+                agents_token_count[name] = tokens
+    print(agents_token_count)
+
+    #print(f"{token_count.num_tokens_from_messages(groupchat.messages, model)} prompt tokens counted by num_tokens_from_messages().")
 
 
 
