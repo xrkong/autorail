@@ -4,7 +4,7 @@ Make LLM's output more consistent with human values, using [AutoGen](https://git
 
 ## 💡 What the project does
 AutoRail is a proof of concept that utilizes AutoGen and Guardrails to align the output of LLMs with human values. It is a project that is still in progress.
-![AutoRail Overview](https://github.com/xrkong/autorail/doc/images/autorail_overview.png)
+![AutoRail Overview](https://github.com/xrkong/autorail/blob/main/doc/images/autorail_overview.png)
 Our goal is to build a complete AI safety framework to evaluate and modify the output text of LLM so that its values align with those of *governments, political parties, and other organizations*.
 
 ## 🌟 Why the project is useful
