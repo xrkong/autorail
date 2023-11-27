@@ -11,7 +11,10 @@ This project provides a framework to score, evaluatr, and revise the output of L
 We provide a framework and you provide the value documents of your organization. 
 
 ## 🚀 How users can get started with the project
-
+This example can be run with
+```bash
+python autorail/autorail.py
+```
 
 ## 📋 Framework details
 
@@ -24,6 +27,7 @@ We provide a framework and you provide the value documents of your organization.
 - [ ] Convert guardrails to system prompt
 - [ ] Azure deployment
 - [ ] Write framework details 
+- [ ] Write tutorials
 - [ ] Package it as a library
 <!-- 
 - [ ] Write a paper 
